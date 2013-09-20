@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentProtobufNet", "FluentProtobufNet\FluentProtobufNet.csproj", "{1116E3EE-EE82-451A-AB15-BF190D4CF57B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentProtobufNet.Tests", "FluentProtobufNet.Tests\FluentProtobufNet.Tests.csproj", "{23B51DF4-8CF6-4EA8-981E-5C0CA16D0E67}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1116E3EE-EE82-451A-AB15-BF190D4CF57B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1116E3EE-EE82-451A-AB15-BF190D4CF57B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1116E3EE-EE82-451A-AB15-BF190D4CF57B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1116E3EE-EE82-451A-AB15-BF190D4CF57B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23B51DF4-8CF6-4EA8-981E-5C0CA16D0E67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23B51DF4-8CF6-4EA8-981E-5C0CA16D0E67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23B51DF4-8CF6-4EA8-981E-5C0CA16D0E67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23B51DF4-8CF6-4EA8-981E-5C0CA16D0E67}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
