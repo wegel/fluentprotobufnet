@@ -7,20 +7,20 @@ namespace FluentProtobufNet
 {
     public class AssemblyTypeSource : ITypeSource
     {
-        readonly Assembly source;
+        readonly Assembly _source;
 
         public AssemblyTypeSource(Assembly source)
         {
             if (source == null) throw new ArgumentNullException("source");
 
-            this.source = source;
+            _source = source;
         }
 
         #region ITypeSource Members
 
         public IEnumerable<Type> GetTypes()
         {
-            return source.GetTypes().OrderBy(x => x.FullName);
+            return _source.GetTypes().OrderBy(x => x.FullName);
         }
 
         public void LogSource(IDiagnosticLogger logger)
@@ -32,14 +32,14 @@ namespace FluentProtobufNet
 
         public string GetIdentifier()
         {
-            return source.GetName().FullName;
+            return _source.GetName().FullName;
         }
 
         #endregion
 
         public override int GetHashCode()
         {
-            return source.GetHashCode();
+            return _source.GetHashCode();
         }
     }
 
@@ -48,17 +48,5 @@ namespace FluentProtobufNet
         IEnumerable<Type> GetTypes();
         //void LogSource(IDiagnosticLogger logger);
         string GetIdentifier();
-    }
-
-    public interface IDiagnosticLogger
-    {
-        void Flush();
-        void FluentMappingDiscovered(Type type);
-        void ConventionDiscovered(Type type);
-        void LoadedFluentMappingsFromSource(ITypeSource source);
-        void LoadedConventionsFromSource(ITypeSource source);
-        void AutomappingSkippedType(Type type, string reason);
-        void AutomappingCandidateTypes(IEnumerable<Type> types);
-        void BeginAutomappingType(Type type);
     }
 }

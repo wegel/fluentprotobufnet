@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using FluentProtobufNet.Mapping;
 using NUnit.Framework;
 using System.Linq;
 using ProtoBuf.Meta;
@@ -8,24 +8,32 @@ namespace FluentProtobufNet.Tests
     [TestFixture]
     public class DevelopmentTests
     {
-        [Test]
-        public Configuration CanBuildConfiguration()
+        private Configuration _config;
+
+        [SetUp]
+        public void Setup()
         {
-            return Fluently.Configure()
-                .Mappings(m => 
+            _config = Fluently.Configure()
+                .Mappings(m =>
                     m.FluentMappings.AddFromAssemblyOf<CategoryMap>())
                 .BuildConfiguration();
         }
 
         [Test]
+        public void CanBuildConfiguration()
+        {
+            Assert.IsNotNull(_config.RuntimeTypeModel);
+            Assert.Greater(_config.RuntimeTypeModel.GetTypes().Cast<object>().Count(), 0);
+        }
+
+        [Test]
         public void CorrectlyMapsSingleLevelSubclasses()
         {
-            var config = CanBuildConfiguration();
-
-            var types = config.RuntimeTypeModel.GetTypes().Cast<MetaType>();
+            var types = _config.RuntimeTypeModel.GetTypes().Cast<MetaType>();
             var category =
                 types.SingleOrDefault(t => t.Type == typeof (Category));
 
+            Assert.IsNotNull(category);
             Assert.IsTrue(category.HasSubtypes);
             Assert.IsTrue(category.GetSubtypes()[0].DerivedType.Type == typeof(CategoryWithDescription));
         }
@@ -33,12 +41,11 @@ namespace FluentProtobufNet.Tests
         [Test]
         public void CorrectlyMapsUpToThirdLevelSubclass()
         {
-            var config = CanBuildConfiguration();
-
-            var types = config.RuntimeTypeModel.GetTypes().Cast<MetaType>();
+            var types = _config.RuntimeTypeModel.GetTypes().Cast<MetaType>();
             var categoryWithDescription =
                 types.SingleOrDefault(t => t.Type == typeof(CategoryWithDescription));
 
+            Assert.IsNotNull(categoryWithDescription);
             Assert.IsTrue(categoryWithDescription.HasSubtypes);
             Assert.IsTrue(categoryWithDescription.GetSubtypes()[0].DerivedType.Type == typeof(CategoryThirdLevel));
         }

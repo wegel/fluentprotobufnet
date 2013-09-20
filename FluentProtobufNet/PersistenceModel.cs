@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FluentProtobufNet.Helpers;
+using FluentProtobufNet.Mapping;
 using ProtoBuf.Meta;
 
 namespace FluentProtobufNet
 {
     public class PersistenceModel
     {
-        protected readonly IList<IMappingProvider> classProviders = new List<IMappingProvider>();
-        protected IDiagnosticLogger log = new NullDiagnosticsLogger();
+        protected readonly IList<IMappingProvider> ClassProviders = new List<IMappingProvider>();
+        protected IDiagnosticLogger Log = new NullDiagnosticsLogger();
         private RuntimeTypeModel _protobufModel;
-        private IList<IMappingProvider> subclassProviders = new List<IMappingProvider>();
+        private readonly IList<IMappingProvider> _subclassProviders = new List<IMappingProvider>();
 
         public void AddMappingsFromAssembly(Assembly assembly)
         {
@@ -22,25 +23,25 @@ namespace FluentProtobufNet
         public void AddMappingsFromSource(ITypeSource source)
         {
             source.GetTypes()
-                .Where(x => IsMappingOf<IMappingProvider>(x))
+                .Where(IsMappingOf<IMappingProvider>)
                 .Each(Add);
 
-            log.LoadedFluentMappingsFromSource(source);
+            Log.LoadedFluentMappingsFromSource(source);
         }
 
-        private bool IsMappingOf<T>(Type type)
+        private static bool IsMappingOf<T>(Type type)
         {
             return !type.IsGenericType && typeof(T).IsAssignableFrom(type);
         }
 
         public void Add(IMappingProvider provider)
         {
-            classProviders.Add(provider);
+            ClassProviders.Add(provider);
         }
 
         public void AddSubclassMap(IMappingProvider provider)
         {
-            subclassProviders.Add(provider);
+            _subclassProviders.Add(provider);
         }
 
         public void Add(Type type)
@@ -53,7 +54,7 @@ namespace FluentProtobufNet
                 {
                     if (mapping.GetType().BaseType.GetGenericTypeDefinition() == typeof (ClassMap<>))
                     {
-                        log.FluentMappingDiscovered(type);
+                        Log.FluentMappingDiscovered(type);
                         Add((IMappingProvider)mapping);
                     }
                     else if (mapping.GetType().BaseType.GetGenericTypeDefinition() == typeof (SubclassMap<>))
@@ -68,12 +69,12 @@ namespace FluentProtobufNet
 
         public virtual void Configure(Configuration cfg)
         {
-            _protobufModel = ProtoBuf.Meta.TypeModel.Create();
-            foreach (var classMap in classProviders)
+            _protobufModel = TypeModel.Create();
+            foreach (var classMap in ClassProviders)
                 classMap.GetRuntimeTypeModel(_protobufModel);
 
-            var subclassProvidersCopy = subclassProviders.ToList();
-            IMappingProvider subclassMap = null;
+            var subclassProvidersCopy = _subclassProviders.ToList();
+            IMappingProvider subclassMap;
             while ((subclassMap = subclassProvidersCopy.FirstOrDefault(sc => sc.CanBeResolvedUsing(_protobufModel))) != null)
             {
                 subclassMap.GetRuntimeTypeModel(_protobufModel);
@@ -85,67 +86,5 @@ namespace FluentProtobufNet
 
             cfg.RuntimeTypeModel = _protobufModel;
         }
-    }
-
-    public class MissingConstructorException : Exception
-    {
-        public Type Type { get; set; }
-
-        public MissingConstructorException(Type type)
-        {
-            Type = type;
-        }
-    }
-
-    public class ReflectHelper
-    {
-        public const BindingFlags AnyVisibilityInstance = BindingFlags.Instance | BindingFlags.Public |
-                                                           BindingFlags.NonPublic;
-        private static readonly System.Type[] NoClasses = System.Type.EmptyTypes;
-
-        public static ConstructorInfo GetDefaultConstructor(System.Type type)
-        {
-            if (IsAbstractClass(type))
-                return null;
-
-            try
-            {
-                ConstructorInfo constructor =
-                    type.GetConstructor(AnyVisibilityInstance, null, CallingConventions.HasThis, NoClasses, null);
-                return constructor;
-            }
-            catch (Exception e)
-            {
-                throw new InstantiationException("A default (no-arg) constructor could not be found for: ", e, type);
-            }
-        }
-
-        public static bool IsAbstractClass(System.Type type)
-        {
-            return (type.IsAbstract || type.IsInterface);
-        }
-    }
-
-    public class InstantiationException : Exception
-    {
-        public string Message { get; set; }
-        public Exception Exception { get; set; }
-        public Type Type { get; set; }
-
-        public InstantiationException(string message, Exception exception, Type type)
-        {
-            Message = message;
-            Exception = exception;
-            Type = type;
-        }
-    }
-
-    public interface IMappingProvider
-    {
-        RuntimeTypeModel GetRuntimeTypeModel(RuntimeTypeModel protobufModel);
-        // HACK: In place just to keep compatibility until verdict is made
-        //HibernateMapping GetHibernateMapping();
-        //IEnumerable<Member> GetIgnoredProperties();
-        bool CanBeResolvedUsing(RuntimeTypeModel protobufModel);
     }
 }

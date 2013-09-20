@@ -1,8 +1,9 @@
 using System;
 using System.Linq;
+using FluentProtobufNet.Exceptions;
 using ProtoBuf.Meta;
 
-namespace FluentProtobufNet
+namespace FluentProtobufNet.Mapping
 {
     public class SubclassMap<T>: ClassMap<T>
     {
@@ -51,13 +52,6 @@ namespace FluentProtobufNet
             {
                 
             }
-        }
-    }
-
-    public class FieldIdAlreadyUsedException : Exception
-    {
-        public FieldIdAlreadyUsedException(int fieldId, MetaType usedBy): base("The field ID " + fieldId + " has already been used by " + usedBy.Name)
-        {
         }
     }
 }

@@ -3,19 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using FluentProtobufNet.Helpers;
-using FluentProtobufNet.Mapping;
 using ProtoBuf.Meta;
 
-namespace FluentProtobufNet
+namespace FluentProtobufNet.Mapping
 {
 
     public class ClassMap<T> : IMappingProvider
     {
-        public IList<NameAndFieldNumber> Fields { get; set; }
+        public IList<PropertyMapping> Fields { get; set; }
 
         public ClassMap()
         {
-            Fields = new List<NameAndFieldNumber>();
+            Fields = new List<PropertyMapping>();
         }
 
 
@@ -24,16 +23,16 @@ namespace FluentProtobufNet
             get { return typeof(T); }
         }
 
-        public NameAndFieldNumber Map(Expression<Func<T, object>> memberExpression, int fieldNumber)
+        public PropertyMapping Map(Expression<Func<T, object>> memberExpression, int fieldNumber)
         {
             return Map(memberExpression.ToMember(), fieldNumber);
         }
 
-        NameAndFieldNumber Map(Member member, int fieldNumber)
+        PropertyMapping Map(Member member, int fieldNumber)
         {
-            ///­OnMemberMapped(member);
+            //­OnMemberMapped(member);
 
-            var field = new NameAndFieldNumber
+            var field = new PropertyMapping
                         {
                             Member = member,
                             FieldNumber = fieldNumber,
@@ -46,21 +45,21 @@ namespace FluentProtobufNet
         }
 
 
-        public NameAndFieldNumber References<TOther>(Expression<Func<T, TOther>> memberExpression, int fieldNumber)
+        public PropertyMapping References<TOther>(Expression<Func<T, TOther>> memberExpression, int fieldNumber)
         {
             return References<TOther>(memberExpression.ToMember(), fieldNumber);
         }
 
-        public NameAndFieldNumber References<TOther>(Expression<Func<T, object>> memberExpression, int fieldNumber)
+        public PropertyMapping References<TOther>(Expression<Func<T, object>> memberExpression, int fieldNumber)
         {
             return References<TOther>(memberExpression.ToMember(), fieldNumber);
         }
 
-        NameAndFieldNumber References<TOther>(Member member, int fieldNumber)
+        PropertyMapping References<TOther>(Member member, int fieldNumber)
         {
             //OnMemberMapped(member);
 
-            var field = new NameAndFieldNumber
+            var field = new PropertyMapping
             {
                 Member = member,
                 FieldNumber = fieldNumber,
@@ -90,7 +89,7 @@ namespace FluentProtobufNet
         }
     }
 
-    public class NameAndFieldNumber
+    public class PropertyMapping
     {
         public Member Member { get; set; }
         public int FieldNumber { get; set;  }

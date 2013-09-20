@@ -6,9 +6,8 @@ namespace FluentProtobufNet
     public class FluentConfiguration
     {
         private readonly Configuration _cfg;
-        private IDiagnosticLogger _logger;
-        readonly List<Action<MappingConfiguration>> mappingsBuilders = new List<Action<MappingConfiguration>>();
-        private bool _mappingsSet;
+        private readonly IDiagnosticLogger _logger;
+        readonly List<Action<MappingConfiguration>> _mappingsBuilders = new List<Action<MappingConfiguration>>();
 
         internal FluentConfiguration()
             : this(new Configuration())
@@ -22,8 +21,7 @@ namespace FluentProtobufNet
 
         public FluentConfiguration Mappings(Action<MappingConfiguration> mappings)
         {
-            mappingsBuilders.Add(mappings);
-            _mappingsSet = true;
+            _mappingsBuilders.Add(mappings);
             return this;
         }
 
@@ -32,7 +30,7 @@ namespace FluentProtobufNet
         {
             var mappingCfg = new MappingConfiguration(_logger);
 
-            foreach (var builder in mappingsBuilders)
+            foreach (var builder in _mappingsBuilders)
                 builder(mappingCfg);
 
             mappingCfg.Apply(Configuration);
